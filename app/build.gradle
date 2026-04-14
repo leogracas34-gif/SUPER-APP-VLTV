@@ -25,6 +25,7 @@ android {
         buildConfigField "String", "TMDB_IMAGE_BASE_URL", '"https://image.tmdb.org/t/p/"'
     }
 
+    // Mantemos o bloco de signingConfigs, mas não o forçaremos no Debug
     signingConfigs {
         release {
             def keystoreFile = rootProject.file("app/keystore.jks")
@@ -35,11 +36,6 @@ android {
                 keyPassword System.getenv("KEY_PASSWORD") ?: "android"
             }
         }
-        debug {
-            storeFile rootProject.file("debug.keystore") .exists()
-                ? rootProject.file("debug.keystore")
-                : null
-        }
     }
 
     buildTypes {
@@ -47,17 +43,13 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            def keystoreFile = rootProject.file("app/keystore.jks")
-            if (keystoreFile.exists()) {
-                signingConfig signingConfigs.release
-            } else {
-                signingConfig signingConfigs.debug
-            }
+            signingConfig signingConfigs.release
         }
         debug {
             minifyEnabled false
             debuggable true
             applicationIdSuffix ".debug"
+            // REMOVIDO: signingConfig aqui para usar a chave padrão do Android e não dar erro no GitHub
         }
     }
 
@@ -87,7 +79,6 @@ android {
         }
     }
 
-    // Room schema
     ksp {
         arg("room.schemaLocation", "$projectDir/schemas")
         arg("room.incremental", "true")
@@ -108,10 +99,7 @@ dependencies {
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation 'androidx.recyclerview:recyclerview:1.3.2'
-    
-    // Atualizado: ViewPager2 para versão estável compatível com indicadores externos
     implementation 'androidx.viewpager2:viewpager2:1.1.0'
-    
     implementation 'androidx.fragment:fragment-ktx:1.6.2'
     implementation 'androidx.activity:activity-ktx:1.8.2'
     implementation 'androidx.coordinatorlayout:coordinatorlayout:1.2.0'
@@ -179,7 +167,7 @@ dependencies {
     // Paging
     implementation 'androidx.paging:paging-runtime-ktx:3.2.1'
 
-    // Dots Indicator (Biblioteca Externa adicionada para o banner)
+    // Dots Indicator (O que adicionamos hoje)
     implementation 'com.tbuonomo:dotsindicator:5.0'
 
     // Tests
