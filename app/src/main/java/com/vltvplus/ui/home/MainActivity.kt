@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private lateinit var navController: NavController
+    private var navController: NavController? = null // Mudado para Nullable por segurança
     val viewModel: HomeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,27 +38,31 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupNavigation() {
+        // Correção de segurança para encontrar o NavHost
         val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navController = navHostFragment.navController
+            .findFragmentById(R.id.nav_host_fragment) as? NavHostFragment
+        
+        navController = navHostFragment?.navController
 
-        if (DeviceUtils.isTV(this)) {
-            binding.bottomNavigation.gone()
-            binding.sideNavigation.show()
-            binding.sideNavigation.setupWithNavController(navController)
-        } else {
-            binding.sideNavigation.gone()
-            binding.bottomNavigation.show()
-            binding.bottomNavigation.setupWithNavController(navController)
+        navController?.let { controller ->
+            if (DeviceUtils.isTV(this)) {
+                binding.bottomNavigation.gone()
+                binding.sideNavigation.show()
+                binding.sideNavigation.setupWithNavController(controller)
+            } else {
+                binding.sideNavigation.gone()
+                binding.bottomNavigation.show()
+                binding.bottomNavigation.setupWithNavController(controller)
+            }
         }
     }
 
     private fun setupUI() {
         binding.ivSearch.setOnClickListener {
-            navController.navigate(R.id.searchFragment)
+            navController?.navigate(R.id.searchFragment)
         }
 
-        navController.addOnDestinationChangedListener { _, destination, _ ->
+        navController?.addOnDestinationChangedListener { _, destination, _ ->
             val showHeader = destination.id != R.id.playerFragment
             if (showHeader) binding.appBar.show() else binding.appBar.gone()
         }
@@ -66,8 +70,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun observeSync() {
         lifecycleScope.launch {
-            viewModel.syncState.collect { state ->
-                // Handle sync state if needed (show loading indicator on first load)
+            viewModel.syncState.collect { _ ->
+                // Mantendo seu comentário original
             }
         }
     }
@@ -78,8 +82,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (RemoteKeyUtils.isBack(keyCode)) {
-            if (navController.currentDestination?.id != R.id.homeFragment) {
-                navController.navigateUp()
+            if (navController?.currentDestination?.id != R.id.homeFragment) {
+                navController?.navigateUp()
                 return true
             }
         }
