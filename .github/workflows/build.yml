@@ -19,7 +19,6 @@ env:
   ANDROID_API: '34'
 
 jobs:
-  # ===== BUILD JOB =====
   build:
     name: Build APK
     runs-on: ubuntu-latest
@@ -40,8 +39,8 @@ jobs:
       - name: 🤖 Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: 🔑 Decode Keystore (release only)
-        if: github.event.inputs.build_type == 'release' || github.ref == 'refs/heads/main'
+      - name: 🔑 Decode Keystore
+        # Agora ele sempre gera o arquivo, garantindo que o Gradle encontre o 'storeFile'
         run: |
           echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/keystore.jks
 
@@ -69,6 +68,11 @@ jobs:
         run: ./gradlew clean
 
       - name: 🏗️ Build Debug APK
+        # Adicionado o bloco env para o debug conseguir assinar o app
+        env:
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew assembleDebug --stacktrace
 
       - name: 🚀 Build Release APK
