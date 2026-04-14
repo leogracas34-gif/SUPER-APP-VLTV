@@ -11,43 +11,41 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+// Estado separado para não misturar idle/loading/success/error
+sealed class LoginUiState {
+    object Idle    : LoginUiState()   // tela limpa, botão habilitado
+    object Loading : LoginUiState()   // spinner girando, botão desabilitado
+    object Success : LoginUiState()   // navegar para MainActivity
+    data class Error(val message: String) : LoginUiState()
+}
+
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val repository: VLTVRepository,
     private val preferenceManager: PreferenceManager
 ) : ViewModel() {
 
-    private val _loginState = MutableStateFlow<Resource<Unit>>(Resource.Loading)
-    val loginState: StateFlow<Resource<Unit>> = _loginState
-
-    private val _dnsStatus = MutableStateFlow<String>("Procurando servidor...")
-    val dnsStatus: StateFlow<String> = _dnsStatus
+    // ← Começa em Idle (não Loading!)
+    private val _loginState = MutableStateFlow<LoginUiState>(LoginUiState.Idle)
+    val loginState: StateFlow<LoginUiState> = _loginState
 
     fun isLoggedIn(): Boolean = preferenceManager.isLoggedIn()
 
     fun login(username: String, password: String) {
         viewModelScope.launch {
-            _loginState.value = Resource.Loading
-            _dnsStatus.value = "Testando servidores..."
+            _loginState.value = LoginUiState.Loading
 
             val result = repository.login(username, password)
-            when (result) {
-                is Resource.Success -> {
-                    _dnsStatus.value = "Conectado!"
-                    _loginState.value = Resource.Success(Unit)
-                }
-                is Resource.Error -> {
-                    _dnsStatus.value = result.message
-                    _loginState.value = result
-                }
-                else -> {}
+
+            _loginState.value = when (result) {
+                is Resource.Success -> LoginUiState.Success
+                is Resource.Error   -> LoginUiState.Error(result.message)
+                else                -> LoginUiState.Error("Erro desconhecido")
             }
         }
     }
 
     fun logout() {
-        viewModelScope.launch {
-            repository.logout()
-        }
+        viewModelScope.launch { repository.logout() }
     }
 }
