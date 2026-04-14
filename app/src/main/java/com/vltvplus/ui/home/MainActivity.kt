@@ -23,7 +23,7 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private var navController: NavController? = null // Mudado para Nullable por segurança
+    private var navController: NavController? = null 
     val viewModel: HomeViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,13 +38,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupNavigation() {
-        // Correção de segurança para encontrar o NavHost
+        // Correção de segurança: tenta encontrar o NavHost sem forçar o fechamento se houver atraso na inflação
         val navHostFragment = supportFragmentManager
             .findFragmentById(R.id.nav_host_fragment) as? NavHostFragment
         
         navController = navHostFragment?.navController
 
         navController?.let { controller ->
+            // Verifica se os componentes de UI estão presentes no layout antes de configurar
             if (DeviceUtils.isTV(this)) {
                 binding.bottomNavigation.gone()
                 binding.sideNavigation.show()
@@ -63,24 +64,31 @@ class MainActivity : AppCompatActivity() {
         }
 
         navController?.addOnDestinationChangedListener { _, destination, _ ->
+            // Mantém a barra de topo visível em tudo, exceto no Player (Layout Premium)
             val showHeader = destination.id != R.id.playerFragment
-            if (showHeader) binding.appBar.show() else binding.appBar.gone()
+            if (showHeader) {
+                binding.appBar.show()
+            } else {
+                binding.appBar.gone()
+            }
         }
     }
 
     private fun observeSync() {
         lifecycleScope.launch {
             viewModel.syncState.collect { _ ->
-                // Mantendo seu comentário original
+                // Observando estado de sincronização com segurança
             }
         }
     }
 
     private fun triggerSync() {
+        // Dispara a sincronização de conteúdo ao abrir a Home
         viewModel.syncContent()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        // Tratamento personalizado para o botão de voltar em controles remotos de TV
         if (RemoteKeyUtils.isBack(keyCode)) {
             if (navController?.currentDestination?.id != R.id.homeFragment) {
                 navController?.navigateUp()
