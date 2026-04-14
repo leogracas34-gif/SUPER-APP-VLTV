@@ -39,7 +39,7 @@ class VLTVRepository @Inject constructor(
         const val TMDB_API_KEY = BuildConfig.TMDB_API_KEY
         const val TMDB_IMAGE_W500 = "https://image.tmdb.org/t/p/w500"
         const val TMDB_IMAGE_ORIGINAL = "https://image.tmdb.org/t/p/original"
-        const val SYNC_INTERVAL_MS = 3 * 60 * 60 * 1000L // 3 hours
+        const val SYNC_INTERVAL_MS = 3 * 60 * 60 * 1000L // 3 horas
         private const val TAG = "VLTVRepository"
     }
 
@@ -85,7 +85,7 @@ class VLTVRepository @Inject constructor(
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Login error", e)
-                Resource.Error("Erro de conexão: Verifique sua internet.")
+                Resource.Error("Erro de conexão: ${e.localizedMessage}")
             }
         }
 
@@ -115,10 +115,19 @@ class VLTVRepository @Inject constructor(
                 }
 
                 coroutineScope {
-                    // Adicionado try/catch individual em cada job para evitar que um erro feche o app
-                    val liveJob = async { try { syncLiveChannels(dns, username, password) } catch(e: Exception) { Log.e(TAG, "Live sync fail", e) } }
-                    val moviesJob = async { try { syncMovies(dns, username, password) } catch(e: Exception) { Log.e(TAG, "Movies sync fail", e) } }
-                    val seriesJob = async { try { syncSeries(dns, username, password) } catch(e: Exception) { Log.e(TAG, "Series sync fail", e) } }
+                    // Proteção individual para cada tarefa de sincronização
+                    val liveJob = async { 
+                        try { syncLiveChannels(dns, username, password) } 
+                        catch (e: Exception) { Log.e(TAG, "Live sync fail", e) } 
+                    }
+                    val moviesJob = async { 
+                        try { syncMovies(dns, username, password) } 
+                        catch (e: Exception) { Log.e(TAG, "Movies sync fail", e) } 
+                    }
+                    val seriesJob = async { 
+                        try { syncSeries(dns, username, password) } 
+                        catch (e: Exception) { Log.e(TAG, "Series sync fail", e) } 
+                    }
                     
                     liveJob.await()
                     moviesJob.await()
@@ -129,7 +138,7 @@ class VLTVRepository @Inject constructor(
                 Resource.Success(Unit)
             } catch (e: Exception) {
                 Log.e(TAG, "SyncAll error", e)
-                Resource.Error("Erro ao sincronizar dados do servidor.")
+                Resource.Error("Erro ao sincronizar dados: ${e.localizedMessage}")
             }
         }
 
@@ -283,6 +292,7 @@ class VLTVRepository @Inject constructor(
             movieDao.update(enriched)
             enriched
         } catch (e: Exception) {
+            Log.e(TAG, "TMDB Movie Enrichment error", e)
             movie
         }
     }
@@ -310,6 +320,7 @@ class VLTVRepository @Inject constructor(
             seriesDao.update(enriched)
             enriched
         } catch (e: Exception) {
+            Log.e(TAG, "TMDB Series Enrichment error", e)
             series
         }
     }
@@ -370,7 +381,9 @@ class VLTVRepository @Inject constructor(
                 }
                 episodeDao.insertAll(entities)
             }
-        } catch (e: Exception) { Log.e(TAG, "Episodes load fail", e) }
+        } catch (e: Exception) { 
+            Log.e(TAG, "Episodes load fail for series $seriesId", e) 
+        }
     }
 
     fun getRecentProgress() = watchProgressDao.getRecentProgress()
@@ -431,6 +444,8 @@ class VLTVRepository @Inject constructor(
                 }
                 epgCacheDao.insertAll(entities)
             }
-        } catch (e: Exception) { Log.e(TAG, "EPG load fail", e) }
+        } catch (e: Exception) { 
+            Log.e(TAG, "EPG load fail for stream $streamId", e) 
+        }
     }
 }
