@@ -11,10 +11,6 @@ import androidx.lifecycle.lifecycleScope
 import com.vltvplus.R
 import com.vltvplus.databinding.ActivityLoginBinding
 import com.vltvplus.ui.home.MainActivity
-import com.vltvplus.utils.Resource
-import com.vltvplus.utils.extensions.gone
-import com.vltvplus.utils.extensions.show
-import com.vltvplus.utils.extensions.toast
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -35,19 +31,21 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
+        // Estado inicial: tela limpa, botão habilitado
+        setIdleState()
+
         binding.btnLogin.setOnClickListener { attemptLogin() }
 
         binding.etPassword.setOnKeyListener { _, keyCode, event ->
             if (event.action == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_ENTER) {
-                attemptLogin()
-                true
+                attemptLogin(); true
             } else false
         }
 
-        // TV remote D-pad focus chain
+        // D-Pad focus chain para TV
         binding.etUsername.nextFocusDownId = R.id.et_password
         binding.etPassword.nextFocusDownId = R.id.btn_login
-        binding.btnLogin.nextFocusUpId = R.id.et_password
+        binding.btnLogin.nextFocusUpId    = R.id.et_password
     }
 
     private fun attemptLogin() {
@@ -72,42 +70,53 @@ class LoginActivity : AppCompatActivity() {
 
     private fun observeState() {
         lifecycleScope.launch {
-            viewModel.dnsStatus.collect { status ->
-                binding.tvDnsStatus.text = status
-            }
-        }
-
-        lifecycleScope.launch {
             viewModel.loginState.collect { state ->
                 when (state) {
-                    is Resource.Loading -> showLoading()
-                    is Resource.Success -> navigateToMain()
-                    is Resource.Error -> {
-                        hideLoading()
-                        binding.tvError.text = state.message
-                        binding.tvError.show()
-                        shakeForm()
-                    }
+                    is LoginUiState.Idle    -> setIdleState()
+                    is LoginUiState.Loading -> setLoadingState()
+                    is LoginUiState.Success -> navigateToMain()
+                    is LoginUiState.Error   -> setErrorState(state.message)
                 }
             }
         }
     }
 
-    private fun showLoading() {
-        binding.progressBar.show()
-        binding.btnLogin.isEnabled = false
-        binding.btnLogin.text = ""
-        binding.tvDnsStatus.show()
-        binding.tvError.gone()
+    // ── Estado: tela inicial limpa ──────────────────────────────────
+    private fun setIdleState() {
+        binding.progressBar.visibility = View.GONE
+        binding.tvDnsStatus.visibility = View.GONE   // ← oculto no idle
+        binding.tvError.visibility     = View.GONE
+        binding.btnLogin.isEnabled     = true
+        binding.btnLogin.text          = getString(R.string.login_button)
+        binding.btnLogin.icon          = getDrawable(R.drawable.ic_login)
     }
 
-    private fun hideLoading() {
-        binding.progressBar.gone()
-        binding.btnLogin.isEnabled = true
-        binding.btnLogin.text = getString(R.string.login_button)
-        binding.tvDnsStatus.gone()
+    // ── Estado: buscando servidor ───────────────────────────────────
+    private fun setLoadingState() {
+        binding.progressBar.visibility = View.VISIBLE
+        binding.tvDnsStatus.visibility = View.VISIBLE
+        binding.tvDnsStatus.text       = "Conectando ao servidor…"
+        binding.tvError.visibility     = View.GONE
+        binding.btnLogin.isEnabled     = false
+        binding.btnLogin.text          = ""
+        binding.btnLogin.icon          = null
     }
 
+    // ── Estado: erro ────────────────────────────────────────────────
+    private fun setErrorState(message: String) {
+        binding.progressBar.visibility = View.GONE
+        binding.tvDnsStatus.visibility = View.GONE   // ← oculto no erro também
+        binding.tvError.visibility     = View.VISIBLE
+        binding.tvError.text           = message
+        binding.btnLogin.isEnabled     = true
+        binding.btnLogin.text          = getString(R.string.login_button)
+        binding.btnLogin.icon          = getDrawable(R.drawable.ic_login)
+
+        val shake = AnimationUtils.loadAnimation(this, R.anim.shake)
+        binding.cardLogin.startAnimation(shake)
+    }
+
+    // ── Navegar para o app ──────────────────────────────────────────
     private fun navigateToMain() {
         startActivity(Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -116,22 +125,17 @@ class LoginActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun shakeForm() {
-        val shake = AnimationUtils.loadAnimation(this, R.anim.shake)
-        binding.cardLogin.startAnimation(shake)
-    }
-
     private fun animateEntrance() {
-        binding.ivLogo.alpha = 0f
-        binding.cardLogin.translationY = 100f
-        binding.cardLogin.alpha = 0f
+        binding.ivLogo.alpha      = 0f
+        binding.cardLogin.alpha   = 0f
+        binding.cardLogin.translationY = 80f
 
-        binding.ivLogo.animate().alpha(1f).setDuration(600).start()
+        binding.ivLogo.animate().alpha(1f).setDuration(500).start()
         binding.cardLogin.animate()
-            .translationY(0f)
             .alpha(1f)
-            .setDuration(600)
-            .setStartDelay(300)
+            .translationY(0f)
+            .setDuration(500)
+            .setStartDelay(250)
             .start()
     }
 }
