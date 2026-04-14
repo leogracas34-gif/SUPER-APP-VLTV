@@ -18,8 +18,8 @@ class MovieGridAdapter(
     private val onClick: (MovieEntity) -> Unit
 ) : ListAdapter<MovieEntity, MovieGridAdapter.VH>(
     object : DiffUtil.ItemCallback<MovieEntity>() {
-        override fun areItemsTheSame(a: MovieEntity, b: MovieEntity) = a.streamId == b.streamId
-        override fun areContentsTheSame(a: MovieEntity, b: MovieEntity) = a == b
+        override fun areItemsTheSame(oldItem: MovieEntity, newItem: MovieEntity) = oldItem.streamId == newItem.streamId
+        override fun areContentsTheSame(oldItem: MovieEntity, newItem: MovieEntity) = oldItem == newItem
     }
 ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = VH(
@@ -49,10 +49,11 @@ class MovieGridAdapter(
 // ===== Movie Category Sidebar Adapter =====
 class MovieCategoryAdapter(
     private val onClick: (CategoryEntity?) -> Unit
-) : ListAdapter<CategoryEntity?, MovieCategoryAdapter.VH>(
-    object : DiffUtil.ItemCallback<CategoryEntity?>() {
-        override fun areItemsTheSame(a: CategoryEntity?, b: CategoryEntity?) = a?.categoryId == b?.categoryId
-        override fun areContentsTheSame(a: CategoryEntity?, b: CategoryEntity?) = a == b
+) : ListAdapter<CategoryEntity, MovieCategoryAdapter.VH>(
+    object : DiffUtil.ItemCallback<CategoryEntity>() {
+        // Correção: Removido o '?' dos parâmetros para garantir o override correto
+        override fun areItemsTheSame(oldItem: CategoryEntity, newItem: CategoryEntity) = oldItem.categoryId == newItem.categoryId
+        override fun areContentsTheSame(oldItem: CategoryEntity, newItem: CategoryEntity) = oldItem == newItem
     }
 ) {
     private var selectedId: String? = null
