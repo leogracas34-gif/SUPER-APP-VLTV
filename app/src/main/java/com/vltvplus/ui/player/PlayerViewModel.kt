@@ -30,13 +30,17 @@ class PlayerViewModel @Inject constructor(
     private var season: Int = 1
     private var episodeNum: Int = 1
     private var ext: String = "ts"
+    
+    // Novas variáveis para persistência de dados
     private var contentTitle: String = ""
+    private var contentThumbnail: String = ""
 
     private var allEpisodes: List<EpisodeEntity> = emptyList()
     private var currentEpisodeIndex: Int = -1
 
+    // Adicionado title e thumbnailUrl ao setup
     fun setup(type: String, streamId: Int, episodeId: String?, ext: String,
-              seriesId: Int, season: Int, episodeNum: Int) {
+              seriesId: Int, season: Int, episodeNum: Int, title: String = "", thumbnail: String = "") {
         this.type = type
         this.streamId = streamId
         this.episodeId = episodeId
@@ -44,6 +48,8 @@ class PlayerViewModel @Inject constructor(
         this.seriesId = seriesId
         this.season = season
         this.episodeNum = episodeNum
+        this.contentTitle = title
+        this.contentThumbnail = thumbnail
 
         viewModelScope.launch {
             val url = when (type) {
@@ -102,6 +108,8 @@ class PlayerViewModel @Inject constructor(
                     contentType = type,
                     position = position,
                     duration = duration,
+                    title = contentTitle, // Agora preenchido
+                    thumbnailUrl = contentThumbnail, // Agora preenchido
                     episodeId = episodeId,
                     seasonNumber = if (type == PlayerActivity.TYPE_EPISODE) season else null,
                     episodeNumber = if (type == PlayerActivity.TYPE_EPISODE) episodeNum else null,
