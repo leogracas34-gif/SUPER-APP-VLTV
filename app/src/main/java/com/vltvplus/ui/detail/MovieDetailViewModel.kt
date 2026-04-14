@@ -36,12 +36,14 @@ class MovieDetailViewModel @Inject constructor(
             movie = repository.enrichMovieWithTmdb(movie)
             _movie.value = movie
 
-            // Load similar from same category
-            if (!movie.categoryId.isNullOrEmpty()) {
-                repository.getMoviesByCategory(movie.categoryId)
-                    .collect { list ->
-                        _similarMovies.value = list.filter { it.streamId != streamId }.take(20)
-                    }
+            // Correção: Uso do .let para garantir o Smart Cast seguro da String
+            movie.categoryId?.let { categoryId ->
+                if (categoryId.isNotEmpty()) {
+                    repository.getMoviesByCategory(categoryId)
+                        .collect { list ->
+                            _similarMovies.value = list.filter { it.streamId != streamId }.take(20)
+                        }
+                }
             }
         }
     }
