@@ -17,28 +17,25 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <!-- Featured ViewPager Hero Banner -->
             <androidx.viewpager2.widget.ViewPager2
                 android:id="@+id/view_pager_featured"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/banner_height_phone" />
 
-            <!-- Dots Indicator -->
-            <com.google.android.material.tabs.TabLayout
+            <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
                 android:id="@+id/dots_indicator"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="-28dp"
                 android:layout_marginBottom="8dp"
-                app:tabBackground="@drawable/tab_selector"
-                app:tabGravity="center"
-                app:tabIndicatorHeight="0dp"
-                app:tabPaddingStart="4dp"
-                app:tabPaddingEnd="4dp"
-                app:tabMinWidth="8dp" />
+                app:dotsColor="#80FFFFFF"
+                app:selectedDotColor="@color/vltv_blue"
+                app:dotsSize="8dp"
+                app:dotsSpacing="4dp"
+                app:dotsCornerRadius="8dp"
+                app:dotsWidthFactor="2.5" />
 
-            <!-- Continue Watching -->
             <TextView
                 android:id="@+id/tv_continue_watching"
                 android:layout_width="match_parent"
@@ -63,7 +60,6 @@
                 android:visibility="gone"
                 tools:listitem="@layout/item_continue_watching" />
 
-            <!-- Recent Movies Row -->
             <TextView
                 android:id="@+id/tv_recent_movies"
                 android:layout_width="match_parent"
@@ -86,7 +82,6 @@
                 android:clipToPadding="false"
                 tools:listitem="@layout/item_content_card" />
 
-            <!-- Top Rated Row -->
             <TextView
                 android:id="@+id/tv_top_rated"
                 android:layout_width="match_parent"
@@ -109,7 +104,6 @@
                 android:clipToPadding="false"
                 tools:listitem="@layout/item_content_card" />
 
-            <!-- Recent Series Row -->
             <TextView
                 android:id="@+id/tv_recent_series"
                 android:layout_width="match_parent"
