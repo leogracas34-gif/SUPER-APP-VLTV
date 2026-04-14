@@ -11,8 +11,9 @@ class VLTVApplication : Application(), Configuration.Provider {
     @Inject
     lateinit var workerFactory: androidx.hilt.work.HiltWorkerFactory
 
-    override fun getWorkManagerConfiguration(): Configuration =
-        Configuration.Builder()
+    // Correção: Alterado de 'fun getWorkManagerConfiguration()' para 'val workManagerConfiguration'
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder()
             .setWorkerFactory(workerFactory)
             .build()
 
