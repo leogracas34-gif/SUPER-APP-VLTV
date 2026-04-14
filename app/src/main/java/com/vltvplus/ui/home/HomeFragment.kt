@@ -54,7 +54,9 @@ class HomeFragment : Fragment() {
             }
         )
         binding.viewPagerFeatured.adapter = featuredAdapter
-        binding.dotsIndicator.attachTo(binding.viewPagerFeatured)
+        
+        // Correção: Alterado de attachTo para setViewPager2 para compatibilidade com ViewPager2
+        binding.dotsIndicator.setViewPager2(binding.viewPagerFeatured)
 
         // Continue Watching
         continueAdapter = ContinueWatchingAdapter { progress ->
