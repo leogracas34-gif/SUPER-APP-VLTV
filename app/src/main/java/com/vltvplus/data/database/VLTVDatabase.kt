@@ -46,7 +46,8 @@ abstract class VLTVDatabase : RoomDatabase() {
                 DATABASE_NAME
             )
                 .fallbackToDestructiveMigration()
-                .setJournalMode(JournalMode.WAL) // Write-Ahead Logging for performance
+                // Correção: Caminho completo para habilitar o Write-Ahead Logging
+                .setJournalMode(RoomDatabase.JournalMode.WRITE_AHEAD_LOGGING)
                 .build()
         }
     }
