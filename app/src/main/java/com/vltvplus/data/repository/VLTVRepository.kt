@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import javax.inject.Singleton
+import android.util.Log
 
 @Singleton
 class VLTVRepository @Inject constructor(
@@ -39,6 +40,7 @@ class VLTVRepository @Inject constructor(
         const val TMDB_IMAGE_W500 = "https://image.tmdb.org/t/p/w500"
         const val TMDB_IMAGE_ORIGINAL = "https://image.tmdb.org/t/p/original"
         const val SYNC_INTERVAL_MS = 3 * 60 * 60 * 1000L // 3 hours
+        private const val TAG = "VLTVRepository"
     }
 
     // ===== AUTHENTICATION =====
@@ -77,18 +79,23 @@ class VLTVRepository @Inject constructor(
                                 Resource.Error("Conta inativa ou expirada.")
                             }
                         } else {
-                            Resource.Error("Credenciais inválidas.")
+                            Resource.Error("Credenciais inválidas ou erro no servidor.")
                         }
                     }
                 }
             } catch (e: Exception) {
-                Resource.Error("Erro de conexão: ${e.localizedMessage}")
+                Log.e(TAG, "Login error", e)
+                Resource.Error("Erro de conexão: Verifique sua internet.")
             }
         }
 
     suspend fun logout() = withContext(Dispatchers.IO) {
-        preferenceManager.clearSession()
-        userSessionDao.clear()
+        try {
+            preferenceManager.clearSession()
+            userSessionDao.clear()
+        } catch (e: Exception) {
+            Log.e(TAG, "Logout error", e)
+        }
     }
 
     // ===== SYNC =====
@@ -102,14 +109,17 @@ class VLTVRepository @Inject constructor(
 
                 val lastSync = preferenceManager.getLastSync()
                 val now = System.currentTimeMillis()
+                
                 if (!forceRefresh && (now - lastSync) < SYNC_INTERVAL_MS && movieDao.count() > 0) {
                     return@withContext Resource.Success(Unit)
                 }
 
                 coroutineScope {
-                    val liveJob = async { syncLiveChannels(dns, username, password) }
-                    val moviesJob = async { syncMovies(dns, username, password) }
-                    val seriesJob = async { syncSeries(dns, username, password) }
+                    // Adicionado try/catch individual em cada job para evitar que um erro feche o app
+                    val liveJob = async { try { syncLiveChannels(dns, username, password) } catch(e: Exception) { Log.e(TAG, "Live sync fail", e) } }
+                    val moviesJob = async { try { syncMovies(dns, username, password) } catch(e: Exception) { Log.e(TAG, "Movies sync fail", e) } }
+                    val seriesJob = async { try { syncSeries(dns, username, password) } catch(e: Exception) { Log.e(TAG, "Series sync fail", e) } }
+                    
                     liveJob.await()
                     moviesJob.await()
                     seriesJob.await()
@@ -118,7 +128,8 @@ class VLTVRepository @Inject constructor(
                 preferenceManager.setLastSync(now)
                 Resource.Success(Unit)
             } catch (e: Exception) {
-                Resource.Error("Erro ao sincronizar: ${e.localizedMessage}")
+                Log.e(TAG, "SyncAll error", e)
+                Resource.Error("Erro ao sincronizar dados do servidor.")
             }
         }
 
@@ -127,15 +138,15 @@ class VLTVRepository @Inject constructor(
         val streamsUrl = "$dns:${DnsManager.DEFAULT_PORT}/player_api.php?username=$username&password=$password&action=get_live_streams"
 
         val categoriesResp = xtreamApi.getLiveCategories(categoriesUrl)
-        val streamsResp = xtreamApi.getLiveStreams(streamsUrl)
-
         if (categoriesResp.isSuccessful) {
             val categories = categoriesResp.body() ?: return
             val catEntities = categories.map { CategoryEntity(it.categoryId, it.categoryName, "live") }
+            
             categoryDao.deleteByType("live")
             categoryDao.insertAll(catEntities)
 
             val catMap = categories.associate { it.categoryId to it.categoryName }
+            val streamsResp = xtreamApi.getLiveStreams(streamsUrl)
 
             if (streamsResp.isSuccessful) {
                 val streams = streamsResp.body() ?: return
@@ -162,14 +173,15 @@ class VLTVRepository @Inject constructor(
         val streamsUrl = "$dns:${DnsManager.DEFAULT_PORT}/player_api.php?username=$username&password=$password&action=get_vod_streams"
 
         val categoriesResp = xtreamApi.getVodCategories(categoriesUrl)
-        val streamsResp = xtreamApi.getVodStreams(streamsUrl)
-
         if (categoriesResp.isSuccessful) {
             val categories = categoriesResp.body() ?: return
             val catEntities = categories.map { CategoryEntity(it.categoryId, it.categoryName, "movie") }
+            
             categoryDao.deleteByType("movie")
             categoryDao.insertAll(catEntities)
+            
             val catMap = categories.associate { it.categoryId to it.categoryName }
+            val streamsResp = xtreamApi.getVodStreams(streamsUrl)
 
             if (streamsResp.isSuccessful) {
                 val streams = streamsResp.body() ?: return
@@ -201,14 +213,15 @@ class VLTVRepository @Inject constructor(
         val streamsUrl = "$dns:${DnsManager.DEFAULT_PORT}/player_api.php?username=$username&password=$password&action=get_series"
 
         val categoriesResp = xtreamApi.getSeriesCategories(categoriesUrl)
-        val streamsResp = xtreamApi.getSeriesList(streamsUrl)
-
         if (categoriesResp.isSuccessful) {
             val categories = categoriesResp.body() ?: return
             val catEntities = categories.map { CategoryEntity(it.categoryId, it.categoryName, "series") }
+            
             categoryDao.deleteByType("series")
             categoryDao.insertAll(catEntities)
+            
             val catMap = categories.associate { it.categoryId to it.categoryName }
+            val streamsResp = xtreamApi.getSeriesList(streamsUrl)
 
             if (streamsResp.isSuccessful) {
                 val streams = streamsResp.body() ?: return
@@ -303,13 +316,11 @@ class VLTVRepository @Inject constructor(
 
     // ===== DATA ACCESS =====
 
-    // Channels
     fun getAllChannels(): Flow<List<ChannelEntity>> = channelDao.getAllChannels()
     fun getChannelsByCategory(categoryId: String): Flow<List<ChannelEntity>> = channelDao.getChannelsByCategory(categoryId)
     suspend fun searchChannels(query: String) = channelDao.searchChannels(query)
     suspend fun getChannelById(id: Int) = channelDao.getChannelById(id)
 
-    // Movies
     fun getAllMovies(): Flow<List<MovieEntity>> = movieDao.getAllMovies()
     fun getMoviesByCategory(categoryId: String): Flow<List<MovieEntity>> = movieDao.getMoviesByCategory(categoryId)
     suspend fun searchMovies(query: String) = movieDao.searchMovies(query)
@@ -317,69 +328,64 @@ class VLTVRepository @Inject constructor(
     fun getRecentMovies() = movieDao.getRecentMovies()
     fun getTopRatedMovies() = movieDao.getTopRatedMovies()
 
-    // Series
     fun getAllSeries(): Flow<List<SeriesEntity>> = seriesDao.getAllSeries()
     fun getSeriesByCategory(categoryId: String): Flow<List<SeriesEntity>> = seriesDao.getSeriesByCategory(categoryId)
     suspend fun searchSeries(query: String) = seriesDao.searchSeries(query)
     suspend fun getSeriesById(id: Int) = seriesDao.getSeriesById(id)
     fun getRecentSeries() = seriesDao.getRecentSeries()
 
-    // Categories
     fun getLiveCategories(): Flow<List<CategoryEntity>> = categoryDao.getCategoriesByType("live")
     fun getMovieCategories(): Flow<List<CategoryEntity>> = categoryDao.getCategoriesByType("movie")
     fun getSeriesCategories(): Flow<List<CategoryEntity>> = categoryDao.getCategoriesByType("series")
 
-    // Episodes
     fun getEpisodesBySeriesId(seriesId: Int): Flow<List<EpisodeEntity>> = episodeDao.getEpisodesBySeriesId(seriesId)
     suspend fun getEpisodesBySeason(seriesId: Int, season: Int) = episodeDao.getEpisodesBySeason(seriesId, season)
 
     suspend fun loadAndCacheEpisodes(seriesId: Int) = withContext(Dispatchers.IO) {
-        val username = preferenceManager.getUsername() ?: return@withContext
-        val password = preferenceManager.getPassword() ?: return@withContext
-        val dns = preferenceManager.getActiveDns() ?: return@withContext
-        val url = "$dns:${DnsManager.DEFAULT_PORT}/player_api.php?username=$username&password=$password&action=get_series_info&series_id=$seriesId"
-        val resp = xtreamApi.getSeriesInfo(url)
-        resp.body()?.episodes?.forEach { (seasonNum, episodes) ->
-            val entities = episodes.map { ep ->
-                EpisodeEntity(
-                    episodeId = ep.id ?: "${seriesId}_${ep.season}_${ep.episodeNum}",
-                    seriesId = seriesId,
-                    episodeNum = ep.episodeNum ?: 0,
-                    title = ep.title,
-                    containerExtension = ep.containerExtension,
-                    plot = ep.info?.plot,
-                    durationSecs = ep.info?.durationSecs,
-                    duration = ep.info?.duration,
-                    movieImage = ep.info?.movieImage,
-                    rating = ep.info?.rating,
-                    season = ep.season ?: seasonNum.toIntOrNull() ?: 1,
-                    releaseDate = ep.info?.releaseDate,
-                    coverBig = ep.info?.coverBig,
-                    tmdbId = ep.info?.tmdbId,
-                    stillPath = null, tmdbOverview = null, tmdbRuntime = null
-                )
+        try {
+            val username = preferenceManager.getUsername() ?: return@withContext
+            val password = preferenceManager.getPassword() ?: return@withContext
+            val dns = preferenceManager.getActiveDns() ?: return@withContext
+            val url = "$dns:${DnsManager.DEFAULT_PORT}/player_api.php?username=$username&password=$password&action=get_series_info&series_id=$seriesId"
+            val resp = xtreamApi.getSeriesInfo(url)
+            resp.body()?.episodes?.forEach { (seasonNum, episodes) ->
+                val entities = episodes.map { ep ->
+                    EpisodeEntity(
+                        episodeId = ep.id ?: "${seriesId}_${ep.season}_${ep.episodeNum}",
+                        seriesId = seriesId,
+                        episodeNum = ep.episodeNum ?: 0,
+                        title = ep.title,
+                        containerExtension = ep.containerExtension,
+                        plot = ep.info?.plot,
+                        durationSecs = ep.info?.durationSecs,
+                        duration = ep.info?.duration,
+                        movieImage = ep.info?.movieImage,
+                        rating = ep.info?.rating,
+                        season = ep.season ?: seasonNum.toIntOrNull() ?: 1,
+                        releaseDate = ep.info?.releaseDate,
+                        coverBig = ep.info?.coverBig,
+                        tmdbId = ep.info?.tmdbId,
+                        stillPath = null, tmdbOverview = null, tmdbRuntime = null
+                    )
+                }
+                episodeDao.insertAll(entities)
             }
-            episodeDao.insertAll(entities)
-        }
+        } catch (e: Exception) { Log.e(TAG, "Episodes load fail", e) }
     }
 
-    // Watch Progress
     fun getRecentProgress() = watchProgressDao.getRecentProgress()
     suspend fun getProgress(contentId: String) = watchProgressDao.getProgressById(contentId)
     suspend fun saveProgress(entity: WatchProgressEntity) = watchProgressDao.upsert(entity)
     suspend fun updateProgress(contentId: String, position: Long) = watchProgressDao.updatePosition(contentId, position)
 
-    // Favorites
     fun getAllFavorites() = favoriteDao.getAllFavorites()
     fun isFavorite(contentId: String) = favoriteDao.isFavorite(contentId)
     suspend fun addFavorite(entity: FavoriteEntity) = favoriteDao.insert(entity)
     suspend fun removeFavorite(contentId: String) = favoriteDao.delete(contentId)
 
-    // Session
     suspend fun getSession() = userSessionDao.getSession()
     fun getSessionFlow() = userSessionDao.getSessionFlow()
 
-    // Stream URLs
     fun buildLiveUrl(streamId: Int): String {
         val dns = preferenceManager.getActiveDns() ?: ""
         val username = preferenceManager.getUsername() ?: ""
@@ -401,16 +407,15 @@ class VLTVRepository @Inject constructor(
         return dnsManager.buildSeriesUrl(dns, username, password, episodeId, ext)
     }
 
-    // EPG
     suspend fun getUpcomingEpg(channelId: String) = epgCacheDao.getUpcomingEpg(channelId)
     suspend fun getCurrentProgram(channelId: String) = epgCacheDao.getCurrentProgram(channelId)
 
     suspend fun loadEpg(streamId: Int, channelId: String) = withContext(Dispatchers.IO) {
-        val username = preferenceManager.getUsername() ?: return@withContext
-        val password = preferenceManager.getPassword() ?: return@withContext
-        val dns = preferenceManager.getActiveDns() ?: return@withContext
-        val url = "$dns:${DnsManager.DEFAULT_PORT}/player_api.php?username=$username&password=$password&action=get_short_epg&stream_id=$streamId&limit=5"
         try {
+            val username = preferenceManager.getUsername() ?: return@withContext
+            val password = preferenceManager.getPassword() ?: return@withContext
+            val dns = preferenceManager.getActiveDns() ?: return@withContext
+            val url = "$dns:${DnsManager.DEFAULT_PORT}/player_api.php?username=$username&password=$password&action=get_short_epg&stream_id=$streamId&limit=5"
             val resp = xtreamApi.getShortEpg(url)
             resp.body()?.epgListings?.let { listings ->
                 val entities = listings.map { epg ->
@@ -426,6 +431,6 @@ class VLTVRepository @Inject constructor(
                 }
                 epgCacheDao.insertAll(entities)
             }
-        } catch (e: Exception) { /* silent */ }
+        } catch (e: Exception) { Log.e(TAG, "EPG load fail", e) }
     }
 }
