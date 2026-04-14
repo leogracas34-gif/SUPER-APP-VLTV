@@ -9,6 +9,6 @@
         android:fontFamily="sans-serif-black"
         android:textSize="72sp"
         android:fillColor="#FFFFFF"
-        android:x="40"
-        android:y="120">VLTV+</text>
+        android:x="40dp"
+        android:y="120dp">VLTV+</text>
 </vector>
