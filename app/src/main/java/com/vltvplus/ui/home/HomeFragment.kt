@@ -16,6 +16,8 @@ import com.vltvplus.ui.home.adapters.ContentRowAdapter
 import com.vltvplus.ui.home.adapters.ContinueWatchingAdapter
 import com.vltvplus.ui.home.adapters.FeaturedBannerAdapter
 import kotlinx.coroutines.launch
+// IMPORT NECESSÁRIO ADICIONADO ABAIXO:
+import com.tbuonomo.viewpagerdotsindicator.DotsIndicator 
 
 class HomeFragment : Fragment() {
 
@@ -55,7 +57,7 @@ class HomeFragment : Fragment() {
         )
         binding.viewPagerFeatured.adapter = featuredAdapter
         
-        // Correção: Alterado de attachTo para setViewPager2 para compatibilidade com ViewPager2
+        // CORREÇÃO: Conectando o indicador ao ViewPager2 corretamente
         binding.dotsIndicator.attachTo(binding.viewPagerFeatured)
 
         // Continue Watching
@@ -116,7 +118,6 @@ class HomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.recentMovies.collect { movies ->
                 recentMoviesAdapter.submitMovies(movies)
-                // Also feed featured banner with first 5 items
                 if (movies.isNotEmpty()) {
                     featuredAdapter.submitMovies(movies.take(5))
                 }
