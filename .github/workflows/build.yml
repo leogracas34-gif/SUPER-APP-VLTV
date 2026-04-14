@@ -1,173 +1,43 @@
-name: Build VLTV Plus APK
+name: Gerador Temporário de Keystore
 
 on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
-  workflow_dispatch:
-    inputs:
-      build_type:
-        description: 'Build type (debug or release)'
-        required: true
-        default: 'debug'
-        type: choice
-        options: [ debug, release ]
-
-env:
-  JAVA_VERSION: '17'
-  ANDROID_API: '34'
+  workflow_dispatch: # Permite rodar manualmente clicando no botão
 
 jobs:
-  # ===== BUILD JOB =====
-  build:
-    name: Build APK
+  generate-keystore:
     runs-on: ubuntu-latest
-
     steps:
-      - name: ⬇️ Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: ☕ Set up JDK 17
+      - name: ☕ Configurar Java
         uses: actions/setup-java@v4
         with:
-          java-version: ${{ env.JAVA_VERSION }}
+          java-version: '17'
           distribution: 'temurin'
-          cache: gradle
 
-      - name: 🤖 Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: 🐘 Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          cache-disabled: true
-
-      - name: 🔑 Decode Keystore (release only)
-        if: github.event.inputs.build_type == 'release' || github.ref == 'refs/heads/main'
+      - name: 🔑 Gerar Arquivo Keystore (.jks)
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/keystore.jks
-        continue-on-error: true
+          keytool -genkey -v \
+            -keystore vltv-keystore.jks \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -alias key0 \
+            -storepass vltv123456 \
+            -keypass vltv123456 \
+            -dname "CN=VLTV Plus, OU=App, O=VLTV, L=Belo Horizonte, ST=Minas Gerais, C=BR"
 
-      - name: 📝 Create local.properties
+      - name: 📜 Converter para Base64 e Mostrar na Tela
         run: |
-          echo "sdk.dir=$ANDROID_HOME" > local.properties
+          echo "=================================================="
+          echo "COPIE O CÓDIGO ABAIXO PARA O SECRET KEYSTORE_BASE64"
+          echo "=================================================="
+          base64 -w 0 vltv-keystore.jks
+          echo ""
+          echo ""
+          echo "=================================================="
 
-      - name: 🔧 Make gradlew executable
-        run: chmod +x gradlew
-
-      - name: 📦 Cache Gradle packages
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: 🧹 Clean project
-        run: gradle clean
-
-      - name: 🏗️ Build Debug APK
-        if: github.event.inputs.build_type != 'release' && github.ref != 'refs/heads/main'
-        run: gradle assembleDebug --stacktrace
-
-      - name: 🚀 Build Release APK
-        if: github.event.inputs.build_type == 'release' || github.ref == 'refs/heads/main'
-        env:
-          KEYSTORE_PATH: app/keystore.jks
-          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
-        run: gradle assembleRelease --stacktrace
-        continue-on-error: true
-
-      - name: 🏗️ Fallback Debug Build
-        if: failure()
-        run: gradle assembleDebug --stacktrace
-
-      - name: 📤 Upload Debug APK
-        if: always()
+      - name: 💾 Salvar Arquivo Keystore (Backup)
         uses: actions/upload-artifact@v4
         with:
-          name: VLTV-Plus-Debug-${{ github.run_number }}
-          path: app/build/outputs/apk/debug/*.apk
-          retention-days: 30
-          if-no-files-found: warn
-
-      - name: 📤 Upload Release APK
-        if: github.ref == 'refs/heads/main'
-        uses: actions/upload-artifact@v4
-        with:
-          name: VLTV-Plus-Release-${{ github.run_number }}
-          path: app/build/outputs/apk/release/*.apk
-          retention-days: 90
-          if-no-files-found: warn
-
-      - name: 📊 Build Summary
-        if: always()
-        run: |
-          echo "## Build Summary" >> $GITHUB_STEP_SUMMARY
-          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Branch | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Commit | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Run # | ${{ github.run_number }} |" >> $GITHUB_STEP_SUMMARY
-
-  # ===== RELEASE JOB =====
-  release:
-    name: Create GitHub Release
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-
-    steps:
-      - name: ⬇️ Checkout code
-        uses: actions/checkout@v4
-
-      - name: ⬇️ Download APK artifact
-        uses: actions/download-artifact@v4
-        with:
-          pattern: VLTV-Plus-*
-          merge-multiple: true
-          path: apks/
-
-      - name: 🏷️ Get version from build.gradle
-        id: version
-        run: |
-          VERSION=$(grep "versionName" app/build.gradle | head -1 | sed 's/.*"\(.*\)".*/\1/')
-          CODE=$(grep "versionCode" app/build.gradle | head -1 | grep -o '[0-9]*')
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "code=$CODE" >> $GITHUB_OUTPUT
-
-      - name: 🚀 Create Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ steps.version.outputs.version }}-build${{ github.run_number }}
-          name: "VLTV+ v${{ steps.version.outputs.version }} (Build ${{ github.run_number }})"
-          body: |
-            ## 📺 VLTV Plus — Release automático
-
-            **Versão:** ${{ steps.version.outputs.version }}
-            **Build:** ${{ github.run_number }}
-            **Commit:** ${{ github.sha }}
-
-            ### Instalação
-            1. Baixe o APK abaixo
-            2. No dispositivo Android/TV: Configurações → Segurança → Fontes desconhecidas → Ativar
-            3. Instale o APK
-
-            ### Compatibilidade
-            - 📱 Android 5.0+ (API 21)
-            - 📺 Android TV
-            - 🔥 Amazon Fire TV / Fire Stick
-            - 📦 Mi Box / Mi Stick
-            - 📦 TV Box (Android)
-          files: apks/*.apk
-          draft: false
-          prerelease: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: vltv-keystore-backup
+          path: vltv-keystore.jks
+          retention-days: 5
