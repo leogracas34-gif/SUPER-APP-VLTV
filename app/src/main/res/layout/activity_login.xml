@@ -119,7 +119,7 @@
                     android:singleLine="true" />
             </com.google.android.material.textfield.TextInputLayout>
 
-            <!-- DNS Status -->
+            <!-- DNS Status: SEMPRE gone por padrão, só aparece durante login -->
             <TextView
                 android:id="@+id/tv_dns_status"
                 android:layout_width="match_parent"
@@ -128,9 +128,7 @@
                 android:textColor="@color/vltv_accent"
                 android:gravity="center"
                 android:layout_marginBottom="8dp"
-                android:visibility="gone"
-                tools:text="Testando servidores…"
-                tools:visibility="visible" />
+                android:visibility="gone" />
 
             <!-- Error -->
             <TextView
@@ -141,23 +139,22 @@
                 android:textColor="@color/vltv_accent_red"
                 android:gravity="center"
                 android:layout_marginBottom="12dp"
-                android:visibility="gone"
-                tools:text="Credenciais inválidas"
-                tools:visibility="visible" />
+                android:visibility="gone" />
 
-            <!-- Login Button -->
+            <!-- Login Button: habilitado por padrão -->
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btn_login"
                 style="@style/VLTVButton.Icon"
                 android:layout_width="match_parent"
                 android:layout_height="52dp"
+                android:enabled="true"
                 android:text="@string/login_button"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:icon="@drawable/ic_login"
                 app:iconGravity="start" />
 
-            <!-- Progress inside button -->
+            <!-- Progress: SEMPRE gone por padrão -->
             <ProgressBar
                 android:id="@+id/progress_bar"
                 android:layout_width="32dp"
