@@ -1,0 +1,15 @@
+<!-- ============================================================
+     INSTRUCTIONS: Create each block below as a SEPARATE file
+     in app/src/main/res/drawable/ with the filename shown.
+     ============================================================ -->
+
+<!-- FILE: gradient_detail_backdrop.xml -->
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <gradient
+        android:angle="270"
+        android:startColor="#00040714"
+        android:centerColor="#99040714"
+        android:endColor="#FF040714"
+        android:type="linear" />
+</shape>

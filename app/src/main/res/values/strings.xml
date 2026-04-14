@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">VLTV+</string>
+    <string name="app_name_full">VLTV Plus</string>
+
+    <!-- Login -->
+    <string name="login_title">Entrar</string>
+    <string name="login_subtitle">Digite suas credenciais para continuar</string>
+    <string name="hint_username">Usuário</string>
+    <string name="hint_password">Senha</string>
+    <string name="login_button">Entrar</string>
+    <string name="logging_in">Conectando…</string>
+    <string name="searching_server">Procurando o servidor mais rápido…</string>
+    <string name="connected">Conectado!</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Início</string>
+    <string name="nav_live">TV ao Vivo</string>
+    <string name="nav_movies">Filmes</string>
+    <string name="nav_series">Séries</string>
+    <string name="nav_search">Buscar</string>
+    <string name="nav_favorites">Favoritos</string>
+    <string name="nav_settings">Configurações</string>
+
+    <!-- Home -->
+    <string name="continue_watching">Continuar Assistindo</string>
+    <string name="recent_movies">Filmes Recentes</string>
+    <string name="top_rated">Mais Bem Avaliados</string>
+    <string name="recent_series">Séries Recentes</string>
+    <string name="featured">Em Destaque</string>
+    <string name="watch_now">Assistir Agora</string>
+    <string name="more_info">Mais Info</string>
+
+    <!-- Player -->
+    <string name="skip_intro">Pular Abertura</string>
+    <string name="next_episode">Próximo Episódio</string>
+    <string name="continue_watching_label">Continuar</string>
+    <string name="player_error">Erro ao reproduzir. Tentando novamente…</string>
+    <string name="buffering">Carregando…</string>
+
+    <!-- Detail -->
+    <string name="watch">Assistir</string>
+    <string name="continue_label">Continuar</string>
+    <string name="trailer">Trailer</string>
+    <string name="add_favorite">Adicionar aos Favoritos</string>
+    <string name="remove_favorite">Remover dos Favoritos</string>
+    <string name="similar_content">Títulos Semelhantes</string>
+    <string name="cast">Elenco</string>
+    <string name="director">Direção</string>
+    <string name="genre">Gênero</string>
+    <string name="year">Ano</string>
+    <string name="rating">Avaliação</string>
+    <string name="runtime">Duração</string>
+    <string name="seasons">Temporadas</string>
+    <string name="episodes">Episódios</string>
+
+    <!-- Search -->
+    <string name="search_hint">Buscar filmes, séries, canais…</string>
+    <string name="search_empty">Nenhum resultado encontrado</string>
+    <string name="search_all">Todos</string>
+    <string name="search_movies">Filmes</string>
+    <string name="search_series">Séries</string>
+    <string name="search_live">TV ao Vivo</string>
+
+    <!-- Categories -->
+    <string name="all_categories">Todos</string>
+    <string name="all_movies">Todos os Filmes</string>
+    <string name="all_series">Todas as Séries</string>
+    <string name="all_channels">Todos os Canais</string>
+
+    <!-- EPG -->
+    <string name="now_playing">Ao vivo agora</string>
+    <string name="up_next">A seguir</string>
+    <string name="no_epg">Sem programação disponível</string>
+
+    <!-- Errors -->
+    <string name="error_no_internet">Sem conexão com a internet</string>
+    <string name="error_server">Erro ao conectar ao servidor</string>
+    <string name="error_invalid_credentials">Usuário ou senha inválidos</string>
+    <string name="error_account_expired">Conta expirada</string>
+    <string name="error_generic">Algo deu errado. Tente novamente</string>
+    <string name="retry">Tentar novamente</string>
+
+    <!-- Settings -->
+    <string name="settings_account">Conta</string>
+    <string name="settings_player">Player</string>
+    <string name="settings_auto_next">Próximo episódio automático</string>
+    <string name="settings_logout">Sair</string>
+    <string name="logout_confirm">Deseja sair da sua conta?</string>
+    <string name="yes">Sim</string>
+    <string name="no">Não</string>
+
+    <!-- Misc -->
+    <string name="loading">Carregando…</string>
+    <string name="refresh">Atualizar</string>
+    <string name="back">Voltar</string>
+    <string name="close">Fechar</string>
+    <string name="season_label">Temporada %d</string>
+    <string name="episode_label">E%d</string>
+    <string name="results_count">%d resultado(s)</string>
+    <string name="movies_count">%d filmes</string>
+    <string name="series_count">%d séries</string>
+</resources>

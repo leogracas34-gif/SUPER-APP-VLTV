@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="180dp"
+    android:viewportWidth="320"
+    android:viewportHeight="180">
+    <path android:fillColor="#040714" android:pathData="M0,0 L320,0 L320,180 L0,180 Z"/>
+    <text
+        android:fontFamily="sans-serif-black"
+        android:textSize="72sp"
+        android:fillColor="#FFFFFF"
+        android:x="40"
+        android:y="120">VLTV+</text>
+</vector>

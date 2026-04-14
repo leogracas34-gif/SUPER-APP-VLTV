@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/homeFragment">
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.vltvplus.ui.home.HomeFragment"
+        android:label="@string/nav_home">
+        <action
+            android:id="@+id/action_home_to_search"
+            app:destination="@id/searchFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/liveTvFragment"
+        android:name="com.vltvplus.ui.live.LiveTvFragment"
+        android:label="@string/nav_live" />
+
+    <fragment
+        android:id="@+id/moviesFragment"
+        android:name="com.vltvplus.ui.movies.MoviesFragment"
+        android:label="@string/nav_movies" />
+
+    <fragment
+        android:id="@+id/seriesFragment"
+        android:name="com.vltvplus.ui.series.SeriesFragment"
+        android:label="@string/nav_series" />
+
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="com.vltvplus.ui.search.SearchFragment"
+        android:label="@string/nav_search">
+        <argument
+            android:name="searchType"
+            app:argType="string"
+            android:defaultValue="all" />
+    </fragment>
+
+    <!-- Activity destinations -->
+    <activity
+        android:id="@+id/movieDetailActivity"
+        android:name="com.vltvplus.ui.detail.MovieDetailActivity"
+        android:label="Detalhes do Filme">
+        <argument
+            android:name="streamId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <argument
+            android:name="resumePosition"
+            app:argType="long"
+            android:defaultValue="0" />
+    </activity>
+
+    <activity
+        android:id="@+id/seriesDetailActivity"
+        android:name="com.vltvplus.ui.detail.SeriesDetailActivity"
+        android:label="Detalhes da Série">
+        <argument
+            android:name="seriesId"
+            app:argType="integer"
+            android:defaultValue="-1" />
+        <argument
+            android:name="episodeId"
+            app:argType="string"
+            android:defaultValue="" />
+    </activity>
+
+    <activity
+        android:id="@+id/playerFragment"
+        android:name="com.vltvplus.ui.player.PlayerActivity"
+        android:label="Player" />
+
+</navigation>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- Base Theme -->
+    <style name="Theme.VLTVPlus" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/vltv_blue</item>
+        <item name="colorPrimaryVariant">@color/vltv_blue_dark</item>
+        <item name="colorOnPrimary">@color/text_primary</item>
+        <item name="colorSecondary">@color/vltv_accent</item>
+        <item name="colorOnSecondary">@color/text_primary</item>
+        <item name="colorSurface">@color/bg_card</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorBackground">@color/bg_primary</item>
+        <item name="colorOnBackground">@color/text_primary</item>
+        <item name="colorError">@color/vltv_accent_red</item>
+        <item name="android:windowBackground">@color/bg_primary</item>
+        <item name="android:statusBarColor">@color/transparent</item>
+        <item name="android:navigationBarColor">@color/bg_primary</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">false</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="materialButtonStyle">@style/VLTVButton</item>
+        <item name="bottomNavigationStyle">@style/VLTVBottomNav</item>
+        <item name="textInputStyle">@style/VLTVTextInput</item>
+    </style>
+
+    <!-- Splash Theme -->
+    <style name="Theme.VLTVPlus.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/bg_primary</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_vltv</item>
+        <item name="windowSplashScreenAnimationDuration">1000</item>
+        <item name="postSplashScreenTheme">@style/Theme.VLTVPlus</item>
+    </style>
+
+    <!-- Player Theme (full immersive) -->
+    <style name="Theme.VLTVPlus.Player" parent="Theme.VLTVPlus">
+        <item name="android:windowBackground">@color/player_bg</item>
+        <item name="android:statusBarColor">@color/transparent</item>
+        <item name="android:navigationBarColor">@color/transparent</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowLayoutInDisplayCutoutMode" tools:targetApi="o_mr1">shortEdges</item>
+    </style>
+
+    <!-- Button Styles -->
+    <style name="VLTVButton" parent="Widget.MaterialComponents.Button">
+        <item name="backgroundTint">@color/vltv_blue</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="android:paddingStart">24dp</item>
+        <item name="android:paddingEnd">24dp</item>
+        <item name="android:minHeight">48dp</item>
+    </style>
+
+    <style name="VLTVButton.Outlined" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="strokeColor">@color/vltv_blue</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="cornerRadius">8dp</item>
+    </style>
+
+    <style name="VLTVButton.Icon" parent="Widget.MaterialComponents.Button.Icon">
+        <item name="backgroundTint">@color/vltv_blue</item>
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="cornerRadius">8dp</item>
+        <item name="iconTint">@color/text_primary</item>
+    </style>
+
+    <style name="VLTVButton.Ghost" parent="Widget.MaterialComponents.Button.TextButton">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="rippleColor">@color/ripple</item>
+    </style>
+
+    <!-- Player Button -->
+    <style name="PlayerControlButton" parent="Widget.MaterialComponents.Button.Icon">
+        <item name="backgroundTint">@color/transparent</item>
+        <item name="iconTint">@color/text_primary</item>
+        <item name="android:minWidth">48dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="rippleColor">@color/ripple</item>
+    </style>
+
+    <!-- Text Input -->
+    <style name="VLTVTextInput" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxStrokeColor">@color/vltv_blue</item>
+        <item name="hintTextColor">@color/text_secondary</item>
+        <item name="android:textColorHint">@color/text_secondary</item>
+        <item name="boxBackgroundColor">@color/bg_card</item>
+        <item name="cornerRadius">10dp</item>
+    </style>
+
+    <!-- Bottom Navigation -->
+    <style name="VLTVBottomNav" parent="Widget.MaterialComponents.BottomNavigationView">
+        <item name="android:background">@color/nav_bg</item>
+        <item name="itemIconTint">@color/nav_selector</item>
+        <item name="itemTextColor">@color/nav_selector</item>
+        <item name="labelVisibilityMode">labeled</item>
+    </style>
+
+    <!-- Card Style -->
+    <style name="VLTVCard" parent="Widget.MaterialComponents.CardView">
+        <item name="cardBackgroundColor">@color/bg_card</item>
+        <item name="cardCornerRadius">10dp</item>
+        <item name="cardElevation">0dp</item>
+    </style>
+
+    <!-- TV Focus Overlay -->
+    <style name="TVFocusFrame">
+        <item name="android:background">@drawable/focus_border</item>
+    </style>
+
+    <!-- Chip Style -->
+    <style name="VLTVChip" parent="Widget.MaterialComponents.Chip.Filter">
+        <item name="android:textColor">@color/text_primary</item>
+        <item name="chipBackgroundColor">@color/chip_bg_selector</item>
+        <item name="chipStrokeColor">@color/chip_stroke_selector</item>
+        <item name="chipStrokeWidth">1dp</item>
+        <item name="chipCornerRadius">20dp</item>
+    </style>
+
+</resources>

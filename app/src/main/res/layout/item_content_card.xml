@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="@dimen/card_width_phone"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    android:focusable="true"
+    android:clickable="true"
+    app:cardBackgroundColor="@color/bg_card"
+    app:cardCornerRadius="@dimen/card_radius"
+    app:cardElevation="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Poster Image -->
+        <ImageView
+            android:id="@+id/iv_poster"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/card_height_phone"
+            android:scaleType="centerCrop"
+            android:background="@color/shimmer_base"
+            android:contentDescription="@null" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/text_primary"
+            android:textSize="12sp"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:padding="6dp"
+            tools:text="Nome do Conteúdo" />
+
+    </LinearLayout>
+
+    <!-- TV Focus Highlight border -->
+    <View
+        android:id="@+id/focus_highlight"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/focus_border"
+        android:visibility="invisible" />
+
+</androidx.cardview.widget.CardView>

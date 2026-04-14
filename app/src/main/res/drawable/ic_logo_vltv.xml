@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="40dp"
+    android:viewportWidth="120"
+    android:viewportHeight="40">
+    <!-- Blue rectangle background pill -->
+    <path android:fillColor="#0063E5"
+        android:pathData="M4,4 Q4,0 8,0 L112,0 Q116,0 116,4 L116,36 Q116,40 112,40 L8,40 Q4,40 4,36 Z"/>
+    <!-- VLTV+ text placeholder (white) -->
+    <path android:fillColor="#FFFFFF"
+        android:pathData="M14,10 L22,10 L26,28 L30,10 L38,10 L31,32 L21,32 Z
+                          M40,10 L48,10 L48,26 L56,26 L56,32 L40,32 Z
+                          M58,10 L74,10 L74,16 L68,16 L68,32 L64,32 L64,16 L58,16 Z
+                          M76,10 L84,10 L88,24 L92,10 L100,10 L93,32 L83,32 Z
+                          M104,10 L112,10 L112,18 L108,18 L108,22 L112,22 L112,30 L104,30 L104,22 L100,22 L100,18 L104,18 Z"/>
+</vector>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacing -->
+    <dimen name="spacing_xs">4dp</dimen>
+    <dimen name="spacing_sm">8dp</dimen>
+    <dimen name="spacing_md">16dp</dimen>
+    <dimen name="spacing_lg">24dp</dimen>
+    <dimen name="spacing_xl">32dp</dimen>
+    <dimen name="spacing_xxl">48dp</dimen>
+
+    <!-- Content Card -->
+    <dimen name="card_width_phone">130dp</dimen>
+    <dimen name="card_height_phone">195dp</dimen>
+    <dimen name="card_width_tv">200dp</dimen>
+    <dimen name="card_height_tv">300dp</dimen>
+    <dimen name="card_radius">10dp</dimen>
+
+    <!-- Featured Banner -->
+    <dimen name="banner_height_phone">240dp</dimen>
+    <dimen name="banner_height_tv">360dp</dimen>
+
+    <!-- Category Sidebar -->
+    <dimen name="sidebar_width">180dp</dimen>
+
+    <!-- Mini Player -->
+    <dimen name="mini_player_height">160dp</dimen>
+    <dimen name="mini_player_width">284dp</dimen>
+
+    <!-- Navigation -->
+    <dimen name="bottom_nav_height">60dp</dimen>
+
+    <!-- Player -->
+    <dimen name="player_control_size">48dp</dimen>
+    <dimen name="player_control_size_lg">64dp</dimen>
+
+    <!-- Typography -->
+    <dimen name="text_xs">10sp</dimen>
+    <dimen name="text_sm">12sp</dimen>
+    <dimen name="text_md">14sp</dimen>
+    <dimen name="text_lg">16sp</dimen>
+    <dimen name="text_xl">20sp</dimen>
+    <dimen name="text_xxl">24sp</dimen>
+    <dimen name="text_title">28sp</dimen>
+    <dimen name="text_hero">36sp</dimen>
+
+    <!-- Elevation -->
+    <dimen name="elevation_card">4dp</dimen>
+    <dimen name="elevation_modal">16dp</dimen>
+
+    <!-- Icons -->
+    <dimen name="icon_sm">18dp</dimen>
+    <dimen name="icon_md">24dp</dimen>
+    <dimen name="icon_lg">32dp</dimen>
+</resources>
