@@ -17,8 +17,8 @@ class SeriesGridAdapter(
     private val onClick: (SeriesEntity) -> Unit
 ) : ListAdapter<SeriesEntity, SeriesGridAdapter.VH>(
     object : DiffUtil.ItemCallback<SeriesEntity>() {
-        override fun areItemsTheSame(a: SeriesEntity, b: SeriesEntity) = a.seriesId == b.seriesId
-        override fun areContentsTheSame(a: SeriesEntity, b: SeriesEntity) = a == b
+        override fun areItemsTheSame(oldItem: SeriesEntity, newItem: SeriesEntity) = oldItem.seriesId == newItem.seriesId
+        override fun areContentsTheSame(oldItem: SeriesEntity, newItem: SeriesEntity) = oldItem == newItem
     }
 ) {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = VH(
@@ -47,10 +47,11 @@ class SeriesGridAdapter(
 
 class SeriesCategoryAdapter(
     private val onClick: (CategoryEntity?) -> Unit
-) : ListAdapter<CategoryEntity?, SeriesCategoryAdapter.VH>(
-    object : DiffUtil.ItemCallback<CategoryEntity?>() {
-        override fun areItemsTheSame(a: CategoryEntity?, b: CategoryEntity?) = a?.categoryId == b?.categoryId
-        override fun areContentsTheSame(a: CategoryEntity?, b: CategoryEntity?) = a == b
+) : ListAdapter<CategoryEntity, SeriesCategoryAdapter.VH>(
+    object : DiffUtil.ItemCallback<CategoryEntity>() {
+        // Correção: Removido o '?' dos parâmetros para garantir que o compilador reconheça o override
+        override fun areItemsTheSame(oldItem: CategoryEntity, newItem: CategoryEntity) = oldItem.categoryId == newItem.categoryId
+        override fun areContentsTheSame(oldItem: CategoryEntity, newItem: CategoryEntity) = oldItem == newItem
     }
 ) {
     private var selectedId: String? = null
