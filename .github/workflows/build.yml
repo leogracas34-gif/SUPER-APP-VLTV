@@ -45,10 +45,7 @@ jobs:
         run: echo "sdk.dir=$ANDROID_HOME" > local.properties
 
       - name: 🔑 Decode Keystore (release only)
-        if: >
-          (github.event.inputs.build_type == 'release' ||
-          github.ref == 'refs/heads/main') &&
-          secrets.KEYSTORE_BASE64 != ''
+        if: github.event.inputs.build_type == 'release' || github.ref == 'refs/heads/main'
         run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > app/keystore.jks
         continue-on-error: true
 
