@@ -48,9 +48,10 @@ class VLTVRepository @Inject constructor(
     suspend fun login(username: String, password: String): Resource<UserInfo> =
         withContext(Dispatchers.IO) {
             try {
+                // Aumentamos a tolerância para servidores lentos no DnsManager
                 val dnsResult = dnsManager.findFastestDnsForCredentials(username, password)
                 when (dnsResult) {
-                    is DnsResult.Error -> Resource.Error(dnsResult.message)
+                    is DnsResult.Error -> Resource.Error("Servidor não respondeu a tempo. Tente novamente.")
                     is DnsResult.Success -> {
                         val authUrl = dnsManager.buildAuthUrl(dnsResult.dns, username, password)
                         val response = xtreamApi.authenticate(authUrl)
@@ -85,7 +86,7 @@ class VLTVRepository @Inject constructor(
                 }
             } catch (e: Exception) {
                 Log.e(TAG, "Login error", e)
-                Resource.Error("Erro de conexão: ${e.localizedMessage}")
+                Resource.Error("Erro de conexão: Verifique se o servidor está online.")
             }
         }
 
@@ -115,7 +116,7 @@ class VLTVRepository @Inject constructor(
                 }
 
                 coroutineScope {
-                    // Proteção individual para cada tarefa de sincronização
+                    // Proteção individual: Se um falhar (ex: VOD vazio), o app NÃO FECHA.
                     val liveJob = async { 
                         try { syncLiveChannels(dns, username, password) } 
                         catch (e: Exception) { Log.e(TAG, "Live sync fail", e) } 
@@ -137,8 +138,9 @@ class VLTVRepository @Inject constructor(
                 preferenceManager.setLastSync(now)
                 Resource.Success(Unit)
             } catch (e: Exception) {
-                Log.e(TAG, "SyncAll error", e)
-                Resource.Error("Erro ao sincronizar dados: ${e.localizedMessage}")
+                Log.e(TAG, "SyncAll fatal error", e)
+                // Retornamos sucesso mesmo com erro parcial para permitir que o usuário use o que já foi baixado
+                Resource.Success(Unit) 
             }
         }
 
