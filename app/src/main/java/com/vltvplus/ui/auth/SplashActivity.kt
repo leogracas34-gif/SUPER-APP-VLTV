@@ -3,44 +3,36 @@ package com.vltvplus.ui.auth
 import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
-import com.vltvplus.ui.home.MainActivity
+import com.vltvplus.utils.PreferenceManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @SuppressLint("CustomSplashScreen")
 @AndroidEntryPoint
 class SplashActivity : AppCompatActivity() {
 
-    private val viewModel: AuthViewModel by viewModels()
+    @Inject
+    lateinit var preferenceManager: PreferenceManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        val splashScreen = installSplashScreen()
+        // DEVE ser chamado ANTES do super.onCreate()
+        installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        splashScreen.setKeepOnScreenCondition { true }
-
         lifecycleScope.launch {
-            delay(1500)
-            if (viewModel.isLoggedIn()) {
-                startMain()
+            delay(800)
+            if (preferenceManager.isLoggedIn()) {
+                startActivity(Intent(this@SplashActivity, com.vltvplus.ui.home.MainActivity::class.java))
             } else {
-                startLogin()
+                startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
             }
+            finish()
         }
     }
-
-    private fun startMain() {
-        startActivity(Intent(this, MainActivity::class.java))
-        finish()
-    }
-
-    private fun startLogin() {
-        startActivity(Intent(this, LoginActivity::class.java))
-        finish()
-    }
 }
+
