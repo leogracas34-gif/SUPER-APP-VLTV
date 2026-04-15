@@ -2,24 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
 
     <!-- TV Features -->
-    <uses-feature
-        android:name="android.hardware.touchscreen"
-        android:required="false" />
-    <uses-feature
-        android:name="android.software.leanback"
-        android:required="false" />
-    <uses-feature
-        android:name="android.hardware.screen.landscape"
-        android:required="false" />
+    <uses-feature android:name="android.hardware.touchscreen"  android:required="false" />
+    <uses-feature android:name="android.software.leanback"     android:required="false" />
 
     <application
         android:name=".VLTVApplication"
@@ -35,7 +24,6 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="34">
 
-        <!-- Splash / Main Activity -->
         <activity
             android:name=".ui.auth.SplashActivity"
             android:exported="true"
@@ -48,14 +36,12 @@
             </intent-filter>
         </activity>
 
-        <!-- Login Activity -->
         <activity
             android:name=".ui.auth.LoginActivity"
             android:exported="false"
             android:screenOrientation="sensor"
             android:windowSoftInputMode="adjustResize" />
 
-        <!-- Main Activity (Home) -->
         <activity
             android:name=".ui.home.MainActivity"
             android:exported="false"
@@ -63,7 +49,6 @@
             android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize|smallestScreenSize"
             android:launchMode="singleTask" />
 
-        <!-- Player Activity -->
         <activity
             android:name=".ui.player.PlayerActivity"
             android:exported="false"
@@ -74,7 +59,6 @@
             android:resizeableActivity="true"
             android:launchMode="singleTop" />
 
-        <!-- Detail Activities -->
         <activity
             android:name=".ui.detail.MovieDetailActivity"
             android:exported="false"
@@ -85,13 +69,7 @@
             android:exported="false"
             android:screenOrientation="sensor" />
 
-        <!-- Background Sync Service -->
-        <service
-            android:name=".service.SyncService"
-            android:exported="false"
-            android:foregroundServiceType="dataSync" />
-
-        <!-- Media Playback Service -->
+        <!-- Media3 Playback Service -->
         <service
             android:name=".service.PlaybackService"
             android:exported="true"
@@ -101,17 +79,7 @@
             </intent-filter>
         </service>
 
-        <!-- WorkManager -->
-        <provider
-            android:name="androidx.startup.InitializationProvider"
-            android:authorities="${applicationId}.androidx-startup"
-            android:exported="false"
-            tools:node="merge">
-            <meta-data
-                android:name="androidx.work.WorkManagerInitializer"
-                android:value="androidx.startup" />
-        </provider>
-
     </application>
 
 </manifest>
+
